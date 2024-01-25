@@ -1,0 +1,6 @@
+dependencies:
+- name: replicated
+  repository: oci://registry.shortrib.io/library
+  version: 1.0.0-beta.13
+digest: sha256:f7a759e7184922ee73e599a6e39f8793b41757b49934bae422a54bf857a43fbe
+generated: "2024-01-25T12:49:28.756713-05:00"
