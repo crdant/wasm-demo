@@ -15,16 +15,18 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.0
+version: 0.2.5
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "0.1.0"
+appVersion: 0.1.1
 
 dependencies:
 - name: replicated
-  version: "1.0.0-beta.13"
-  repository: "oci://registry.shortrib.io/library"
-
+  version: 1.0.0-beta.13
+  repository: oci://registry.shortrib.io/library
+- name: spin-containerd-shim-installer 
+  version: 0.10.0
+  repository: file://../spin-containerd-shim-installer

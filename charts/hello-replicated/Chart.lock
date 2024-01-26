@@ -2,5 +2,8 @@ dependencies:
 - name: replicated
   repository: oci://registry.shortrib.io/library
   version: 1.0.0-beta.13
-digest: sha256:f7a759e7184922ee73e599a6e39f8793b41757b49934bae422a54bf857a43fbe
-generated: "2024-01-25T12:49:28.756713-05:00"
+- name: spin-containerd-shim-installer
+  repository: file://../spin-containerd-shim-installer
+  version: 0.10.0
+digest: sha256:2f3c1a18fc7ee846e85689fda0697a3bba9176fc6869b861788ac61796ec6d14
+generated: "2024-01-26T11:41:40.896745-05:00"
