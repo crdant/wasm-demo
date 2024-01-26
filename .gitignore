@@ -26,3 +26,7 @@ go.work
 
 # spin runtime working files
 .spin
+
+# ignore build helm charts and dependencies
+charts/hello-replicated/charts
+kots/*.tgz

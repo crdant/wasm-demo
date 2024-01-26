@@ -2,7 +2,7 @@ spin_manifest_version = 2
 
 [application]
 name = "hello-replicated"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Chuck D'Antonio <chuck@crdant.io>"]
 description = "Exmaple application for running WASM on Replicated Embedded Cluster"
 

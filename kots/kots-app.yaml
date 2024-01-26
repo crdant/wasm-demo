@@ -1,0 +1,17 @@
+---
+apiVersion: kots.io/v1beta1
+kind: Application
+metadata:
+  name: hello-replicated
+spec:
+  title: Hello, Replicated (WASM Edition)
+  icon: https://raw.githubusercontent.com/carlosbaraza/web-assembly-logo/master/dist/logo/web-assembly-logo-128px.png
+  statusInformers:
+    - deployment/hello-replicated
+  ports:
+    - serviceName: "hello-replicated"
+      servicePort: 3000
+      localPort: 8888
+      applicationUrl: "http://hello-replicated"
+  additionalNamespaces:
+    - kube-system

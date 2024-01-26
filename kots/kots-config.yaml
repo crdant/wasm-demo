@@ -1,0 +1,36 @@
+---
+apiVersion: kots.io/v1beta1
+kind: Config
+metadata:
+  name: config-sample
+spec:
+  groups:
+    - name: hello-replicated
+      title: Application Core
+      description: |
+        For this section, you can specify some core parameters for how
+        Hello Replicated operates, including the domain where users will access it
+        and the user who can administer it.
+      items:
+        - name: replicas
+          title: Instances
+          help_text: >
+            The number of instances of the application to run
+            the `https://` or any path elements.
+          type: text
+          required: true
+          validation:
+            regex: 
+              pattern: ^\d+$
+              message: Please enter a number of instancess
+        - name: domain
+          title: Hostname
+          help_text: >
+            The domain name at which you'll access Hello Replicated. Don't include
+            the `https://` or any path elements.
+          type: text
+          required: true
+          validation:
+            regex: 
+              pattern: ^(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\.[a-zA-Z]{2,3})$
+              message: Please enter a valid hostname

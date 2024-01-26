@@ -1,0 +1,22 @@
+apiVersion: v2
+appVersion: 0.10.0
+description: A Helm chart for installing the containerd shim for Spin on Kubernetes
+home: https://github.com/fermyon/spin-containerd-shim-installer
+icon: https://raw.githubusercontent.com/fermyon/spin-containerd-shim-installer/main/icon.svg
+keywords:
+- fermyon
+- spin
+- containerd
+- wasm
+- wasi
+- webassembly
+kubeVersion: '>=1.20.0'
+maintainers:
+- email: justin.pflueger@fermyon.com
+  name: Justin Pflueger
+name: spin-containerd-shim-installer
+sources:
+- https://github.com/fermyon/spin-containerd-shim-installer
+- https://github.com/deislabs/containerd-wasm-shims
+type: application
+version: 0.10.0

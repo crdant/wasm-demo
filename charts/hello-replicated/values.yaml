@@ -5,12 +5,12 @@
 replicaCount: 1
 
 image:
-  repository: registry.shortrib.dev/library/hello-replicated:v0.1.0
+  repository: registry.shortrib.dev/library/hello-replicated
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: v0.1.1
 
-runtimeClass: wasm-spin
+runtimeClassName: wasmtime-spin-v2
 
 imagePullSecrets: []
 nameOverride: ""

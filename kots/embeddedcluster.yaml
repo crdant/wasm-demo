@@ -1,0 +1,12 @@
+apiVersion: embeddedcluster.replicated.com/v1beta1
+kind: Config
+spec:
+  version: 1.28.5+ec.4
+  roles:
+    controller:
+      labels:
+        plugin.k0sproject.io/wasm-enabled: "true" 
+    custom:
+      - name: runner
+        labels:
+          plugin.k0sproject.io/wasm-enabled: "true" 

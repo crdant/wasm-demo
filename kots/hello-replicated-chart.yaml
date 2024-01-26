@@ -1,0 +1,32 @@
+apiVersion: kots.io/v1beta2
+kind: HelmChart
+metadata:
+  name: hello-replicated
+spec:
+  # chart identifies a matching chart from a .tgz
+  chart:
+    name: hello-replicated
+    chartVersion: 0.2.5
+
+  # values are used in the customer environment, as a pre-render step
+  # these values will be supplied to helm template
+  values:
+    # Default values for hello-replicated.
+    # This is a YAML-formatted file.
+    # Declare variables to be passed into your templates.
+
+    replicaCount: '{{repl ConfigOption "replicas" }}'
+
+    # image:
+      # repository: '{{repl HasLocalRegistry | ternary LocalRegistryHost "registry.shortrib.dev" }}/{{repl HasLocalRegistry | ternary LocalRegistryNamespace (print "proxy/" (LicenseFieldValue "appSlug") "/library" ) }}/hello-replicated'
+
+    service:
+      type: NodePort
+
+    runtimeClass: wasmtime-spin-v2
+
+    spin-containerd-shim-installer:
+      installer:
+        hostEtcContainerdPath: /etc/k0s/containerd.d
+        hostBinPath: /var/lib/k0s/bin 
+
