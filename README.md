@@ -26,6 +26,8 @@ use [Homebrew](https://brew.sh), you can install all of them with `brew bundle i
 
 ### Makefile Reference
     
+| target    | purpose |
+|-----------|---------|
 | `app`     | Creates an application for the demo on the Replicated Vendor Portal |
 | `lint`    | Run the linter against the release |
 | `build`   | Builds the WASM module from the Go source code using TinyGo |
