@@ -1,171 +1,66 @@
-Replicated Kubernetes Starter
-==================
+Replicated WASM Demo
+====================
 
-Example project showcasing how power users can leverage the Replicated CLI Tools to manage kots YAMLs using a git repository.
-
-### Get started
-
-This repo is a [GitHub Template Repository](https://help.github.com/en/articles/creating-a-repository-from-a-template). You can create a private copy by using the "Use this Template" link in the repo:
-
-![Template Repo](https://help.github.com/assets/images/help/repository/use-this-template-button.png)
-
-You should use the template to create a new **private** repo in your org, for example `mycompany/kots-app` or `mycompany/replicated-starter-kots`.
-
-Once you've created a repository from the template, you'll want to `git clone` your new repo and `cd` into it locally.
+This repository contains a simple Go application called "Hello, Replicated!"
+that is compiled to WebAssembly using the
+p[Spin](https://developer.fermyon.com/spin/v2/index) framework. It's
+deliberately simple and used to show how an application using a custom runtime
+can be deployed using the Replicated Embedded Cluster. 
 
 
-#### Install CLI
+Using the Demo
+--------------
 
-### 1. Install CLI
+### Required Tools
 
-To start, you'll want to install the `replicated` CLI.
-You can install with [homebrew](https://brew.sh) or grab the latest Linux or macOS version from [the replicatedhq/replicated releases page](https://github.com/replicatedhq/replicated/releases).
+There are a few tools and services required to use the demonstration. If you
+use [Homebrew](https://brew.sh), you can install all of them with `brew bundle install`.
 
-##### Brew
+* [`replicated`](https://docs.replicated.com/reference/replicated-cli-installing)
+* [`spin`](https://developer.fermyon.com/spin/v2/install)
+* [`helm`](https://helm.sh/docs/intro/install/)
+* A container registry. You can use [Docker Hub](https://hub.docker.com/) or
+  any other public registry if you don't have your onw.
+* The [Replicated Vendor Portal](https://vendor.replicated.com). You can [set up
+  a trial account](https://vendor.replicated.com/signup) if you do not already have access.
 
-```shell script
-brew install replicatedhq/replicated/cli
-```
+### Makefile Reference
+    
+| `app`     | Creates an application for the demo on the Replicated Vendor Portal |
+| `lint`    | Run the linter against the release |
+| `build`   | Builds the WASM module from the Go source code using TinyGo |
+| `image`   | Pushes the WASM module to the registry as an OCI image |
+| `chart`   | Packages the Helm chart with updated dependencies |
+| `release` | Releases the demo application on the Vendor Portal |
 
-##### Manual
+How it Works
+------------
 
-###### Linux
+Though designed to showcase the Spin runtime with the Replicated Embedded
+Cluster, this demonstration uses components that allow it to be installed with
+all of the installation mechanisms the Replicated platform supports.
 
-```shell script
-curl -s https://api.github.com/repos/replicatedhq/replicated/releases/latest \
-           | grep "browser_download_url.*$(uname | tr '[:upper:]' '[:lower:]')_amd64.tar.gz" \
-           | cut -d : -f 2,3 \
-           | tr -d \" \
-           | cat <( echo -n "url") - \
-           | curl -fsSL -K- \
-           | tar xvz replicated
-```
+The application is packaged in a Helm chart, and the chart uses two child
+charts. The first chart supplies the Spin runtime and requires privileged
+access to the cluster. It's a fork of [the
+chart](https://github.com/fermyon/spin-containerd-shim-installer?tab=readme-ov-file)
+provided by the Spin team to account for a naming error in the current chart.
+Its role is to install and configure the containerd shim for Spin on all worker
+nodes using a DaemonSet. It also creates the `wasmtime-spin-v2` RuntimeClass
+that the main application will use.
 
-##### Mac
+The second child chart is the [Replicated
+SDK](https://docs.replicated.com/vendor/replicated-sdk-overview) which provides
+an in-cluster API for Replicated Platform services like upgrade checks,
+customer telemetry, and licensing. In the current implementation the
+application does not call the SDK directly and only depends on it to provide
+telemetry.
 
-
-```shell script
-curl -s https://api.github.com/repos/replicatedhq/replicated/releases/latest \
-           | grep "browser_download_url.*$(uname | tr '[:upper:]' '[:lower:]')_all.tar.gz" \
-           | cut -d : -f 2,3 \
-           | tr -d \" \
-           | cat <( echo -n "url") - \
-           | curl -fsSL -K- \
-           | tar xvz replicated
-```
-
-Then move `./replicated` to somewhere in your `PATH`:
-
-
-```shell script
-mv replicated /usr/local/bin/
-```
-
-##### Verifying
-
-You can verify it's installed with `replicated version`:
-
-```text
-$ replicated version
-```
-```json
-{
-  "version": "0.31.0",
-  "git": "c67210a",
-  "buildTime": "2020-09-03T18:31:11Z",
-  "go": {
-      "version": "go1.14.7",
-      "compiler": "gc",
-      "os": "darwin",
-      "arch": "amd64"
-  }
-}
-```
-
-
-#### Configure environment
-
-You'll need to set up two environment variables to interact with vendor.replicated.com:
-
-```
-export REPLICATED_APP=...
-export REPLICATED_API_TOKEN=...
-```
-
-`REPLICATED_APP` should be set to the app slug from the Settings page:
-
-<p align="center"><img src="./doc/REPLICATED_APP.png" width=600></img></p>
-
-Next, create a Service Account API token from the vendor portal under [Service Accounts](https://vendor.replicated.com/team/serviceaccounts):
-
-<p align="center"><img src="./doc/REPLICATED_API_TOKEN.png" width=600></img></p>
-
-Ensure the token has the appropriate "Write" access in the selected [RBAC policy](https://vendor.replicated.com/team/policies) or you'll be unable create new releases. Once you have the values,
-set them in your environment.
-
-```
-export REPLICATED_APP=...
-export REPLICATED_API_TOKEN=...
-```
-
-You can ensure this is working with
-
-```
-replicated release ls
-```
-
-#### Iterating on your release
-
-Once you've made changes to your manifests, lint them with
-
-```
-replicated release lint --yaml-dir=manifests
-```
-
-You can push a new release to a channel with
-
-```
-replicated release create --auto
-```
-
-By default the `Unstable` channel will be used. You can override this with the `--promote` flag:
-
-```
-replicated release create --auto --promote=Beta
-```
-
-
-### Integrating with GitHub
-
-This repo contains a [GitHub Actions](https://help.github.com/en/github/automating-your-workflow-with-github-actions/about-github-actions) workflow for ci at [./.github/workflows/main.yml](./.github/workflows/main.yml). You'll need to [configure secrets](https://help.github.com/en/github/automating-your-workflow-with-github-actions/virtual-environments-for-github-actions#creating-and-using-secrets-encrypted-variables) for `REPLICATED_APP` and `REPLICATED_API_TOKEN`. On every push this will:
-
-- Ensure a channel exists for the branch that was pushed to
-- Create a release based on the contents of `./manifests`
-
-### Integration with GitLab
-
-This repo contains GitLab CI configuration [.gitlab-ci.yaml](./gitlab-ci.yml). The configuration requires a `REPLICATED_APP` and `REPLICATED_API_TOKEN` variables set outside of the configuration using [GitLab CI/CD Variables](https://docs.gitlab.com/ee/ci/variables/#define-a-cicd-variable-in-the-ui)
-
-The pipeline in the example configuration:
-
-- Prints out variables. *This stem must be used only for debug purposes and removed for pdouction.*
-- Creates replicated release
-- Creates kURL installer release based on the [./kurl-installer.yaml](./kurl-installer.yaml) spec
-
-## Advanced Usage
-
-### Integrating kurl installer yaml
-
-There is a file `kurl-installer.yaml` that can be used to manage [kurl.sh](https://kurl.sh) installer versions for an embedded Kubernetes cluster. This will be automatically released in CI. You can create a release manually with
-
-```
-replicated installer create --auto
-```
-
-### Tools reference
-
-- [replicated vendor cli](https://github.com/replicatedhq/replicated)
-
-### License
-
-MIT
+To support the Replicated KOTS Admin Console and Embedded Cluster installation
+methods, we described the application with a series of YAML files that describe
+how to install the application. These files handle branding of the application,
+collecting input from the installer, and mapping the configuration the user
+provides to values for the Helm chart. An additional manifest describes the
+version of the Replicated Embedded Cluster to use for the installation and any
+customizations it requires. The current version has no customizations. You can
+see these files in the `kots` directory.
